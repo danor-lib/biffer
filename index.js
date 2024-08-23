@@ -1,4 +1,4 @@
-import { fstatSync, openSync, readSync } from 'fs';
+import { closeSync, fstatSync, openSync, readSync } from 'fs';
 import { dirname, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -206,11 +206,11 @@ export default class Biffer {
 	get length() { return this.#length; }
 
 	/**
-	 * use File Descriptor instead Buffer or not
+	 * Indicates whether Biffer is using a file descriptor
 	 * @type {number}
 	 * */
-	#useFD = false;
-	get useFD() { return this.#useFD; }
+	#usingFileDescriptor = false;
+	get usingFileDescriptor() { return this.#usingFileDescriptor; }
 
 
 
@@ -225,12 +225,12 @@ export default class Biffer {
 		else if(typeof raw == 'number') {
 			this.#target = raw;
 
-			this.#useFD = true;
+			this.#usingFileDescriptor = true;
 		}
 		else if(typeof raw == 'string') {
 			this.#target = openSync(raw);
 
-			this.#useFD = true;
+			this.#usingFileDescriptor = true;
 
 			this.path = raw;
 		}
@@ -239,7 +239,7 @@ export default class Biffer {
 		}
 
 
-		this.#length = this.useFD ?
+		this.#length = this.usingFileDescriptor ?
 			fstatSync(this.#target).size :
 			this.#target.length;
 	}
@@ -255,11 +255,11 @@ export default class Biffer {
 		const sizeData = Biffer.calc(format, this.locale);
 
 		let buffer = this.target;
-		if(this.useFD) {
+		if(this.usingFileDescriptor) {
 			readSync(this.target, buffer = Buffer.alloc(sizeData), 0, sizeData, this.pos);
 		}
 
-		const [data, byteRead] = Biffer.unpack(format, buffer, this.useFD ? 0 : this.pos, this.locale);
+		const [data, byteRead] = Biffer.unpack(format, buffer, this.usingFileDescriptor ? 0 : this.pos, this.locale);
 
 		this.#pos += byteRead;
 
@@ -305,11 +305,11 @@ export default class Biffer {
 
 		const end = this.pos + size;
 
-		const buffer = this.useFD ?
+		const buffer = this.usingFileDescriptor ?
 			Buffer.alloc(size) :
 			this.target.slice(this.pos, end);
 
-		if(this.useFD) {
+		if(this.usingFileDescriptor) {
 			readSync(this.target, buffer, 0, size, this.pos);
 		}
 
@@ -336,7 +336,7 @@ export default class Biffer {
 
 		let offset = -1;
 
-		if(this.useFD) {
+		if(this.usingFileDescriptor) {
 			const buffer = Buffer.alloc(1024 * 1024 + bufferData.length);
 			const lengthAll = this.length;
 			const lengthRead = buffer.length;
@@ -394,6 +394,20 @@ export default class Biffer {
 	 */
 	isEnd() {
 		return this.pos >= this.length;
+	}
+
+	/**
+	 * Close target file descriptor (if avaliable)
+	 */
+	close() {
+		if(this.#usingFileDescriptor && typeof this.#target == 'number') {
+			try {
+				closeSync(this.#target);
+			}
+			catch(error) {
+				if(error.code != 'EBADF') { throw error; }
+			}
+		}
 	}
 }
 

@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v2.7.0 - 2024.08.23 16
+* feat: new Biffer method `close()` to provide a way to close the file descriptor being used by Biffer
+* refactor!: rename Biffer property `usingFileDescriptor` from `useFD`
+* deps: bump up dependencies
+* docs: move types into types folder
+* docs: update the usage of tsc
+* docs: tweak description
+* chore: renew develop environments
+
+
 ## v2.6.0 - 2023.12.06 19
 * tweak enviroment
 * bump up dependencies
