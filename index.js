@@ -8,7 +8,7 @@ import { loadI18NResource, TT } from '@nuogz/i18n';
 
 loadI18NResource('@nuogz/biffer', resolve(dirname(fileURLToPath(import.meta.url)), 'locale'));
 
-const T = TT('@nuogz/biffer');
+const { T } = TT('@nuogz/biffer');
 
 
 
@@ -136,7 +136,7 @@ export default class Biffer {
 			}
 			// padding
 			else if(charType != 'x') {
-				throw TypeError(T('ArgumentError.invalidFormatChar', { value: charType }, 'Biffer.unpack'));
+				throw TypeError(T('invalid-format-char', { value: charType }, 'Biffer.unpack'));
 			}
 
 
@@ -166,7 +166,7 @@ export default class Biffer {
 			const len = Biffer.dictSize[char];
 
 			if(!len) {
-				throw TypeError(T('ArgumentError.invalidFormatChar', { value: char }, 'Biffer.calc'));
+				throw TypeError(T('invalid-format-char', { value: char }, 'Biffer.calc'));
 			}
 			else {
 				length += len * (~~count || 4);
@@ -235,7 +235,7 @@ export default class Biffer {
 			this.path = raw;
 		}
 		else {
-			throw TypeError(T('ArgumentError.invalidConstructorRaw', { value: raw }, 'Biffer.constructor'));
+			throw TypeError(T('invalid-constructor-raw', { value: raw }, 'Biffer.constructor'));
 		}
 
 
@@ -280,7 +280,7 @@ export default class Biffer {
 	 * @returns {number}
 	 */
 	seek(position) {
-		if(typeof position != 'number') { throw TypeError(T('ArgumentError.invalidSeekPosition', { value: position }, 'Biffer().seek')); }
+		if(typeof position != 'number') { throw TypeError(T('invalid-seek-position', { value: position }, 'Biffer().seek')); }
 
 		return this.#pos = position;
 	}
@@ -290,7 +290,7 @@ export default class Biffer {
 	 * @returns {number}
 	 */
 	skip(offset) {
-		if(typeof offset != 'number') { throw TypeError(T('ArgumentError.invalidSkipOffset', { value: offset }, 'Biffer().skip')); }
+		if(typeof offset != 'number') { throw TypeError(T('invalid-skip-offset', { value: offset }, 'Biffer().skip')); }
 
 		return this.#pos += offset;
 	}
@@ -301,7 +301,7 @@ export default class Biffer {
 	 * @returns {Buffer}
 	 */
 	slice(size) {
-		if(typeof size != 'number') { throw TypeError(T('ArgumentError.invalidSliceSize', { value: size }, 'Biffer().slice')); }
+		if(typeof size != 'number') { throw TypeError(T('invalid-slice-size', { value: size }, 'Biffer().slice')); }
 
 		const end = this.pos + size;
 

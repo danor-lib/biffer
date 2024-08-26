@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.7.1 - 2024.08.26 11
+* refactor: renew codes to adapt to latest `@nuogz/i18n`
+* docs: renew locale with latest `@nuogz/i18n`
+* deps: bump up dependencies
+
+
 ## v2.7.0 - 2024.08.23 16
 * feat: new Biffer method `close()` to provide a way to close the file descriptor being used by Biffer
 * refactor!: rename Biffer property `usingFileDescriptor` from `useFD`

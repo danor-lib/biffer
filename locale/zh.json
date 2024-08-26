@@ -1,14 +1,9 @@
 {
 	"ArgumentError": {
-		"invalidFormatChar@proto": "参数'format'的每一字符必须是字符[xscfdbhilqBHILQ]的其中之一，值：{{-value,valueType}}",
-		"invalidFormatChar@hades": "参数~[format]的每一字符必须是字符~{xscfdbhilqBHILQ}的其中之一，值{{-value,valueType@hades}}",
-		"invalidConstructorRaw@proto": "参数'raw'必须是类型string、number或Buffer实例的其中之一，值：{{-value,valueType}}",
-		"invalidConstructorRaw@hades": "参数~[raw]必须是类型~{string}、~{number}或~{Buffer}实例的其中之一，值{{-value,valueType@hades}}",
-		"invalidSeekPosition@proto": "参数'position'必须是类型number，值：{{-value,valueType}}",
-		"invalidSeekPosition@hades": "参数~[position]必须是类型~{number}，值{{-value,valueType@hades}}",
-		"invalidSkipOffset@proto": "参数'offset'必须是类型number，值：{{-value,valueType}}",
-		"invalidSkipOffset@hades": "参数~[offset]必须是类型~{number}，值{{-value,valueType@hades}}",
-		"invalidSliceSize@proto": "参数'size'必须是类型number，值：{{-value,valueType}}",
-		"invalidSliceSize@hades": "参数~[size]必须是类型~{number}，值{{-value,valueType@hades}}"
+		"invalid-format-char": "参数~[format]的每一字符必须是字符~{xscfdbhilqBHILQ}的其中之一，值{{-value,valueType}}",
+		"invalid-constructor-raw": "参数~[raw]必须是类型~{string}、~{number}或~{Buffer}实例的其中之一，值{{-value,valueType}}",
+		"invalid-seek-position": "参数~[position]必须是类型~{number}，值{{-value,valueType}}",
+		"invalid-skip-offset": "参数~[offset]必须是类型~{number}，值{{-value,valueType}}",
+		"invalid-slice-size": "参数~[size]必须是类型~{number}，值{{-value,valueType}}"
 	}
 }
