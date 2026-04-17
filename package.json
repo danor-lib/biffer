@@ -1,41 +1,37 @@
 {
-	"name": "@nuogz/biffer",
-	"version": "2.7.1",
+	"name": "@danor-lib/biffer",
+	"version": "3.0.0",
 	"description": "Binary data unpack library based on Node.js Buffer",
 	"author": "DanoR",
 	"license": "LGPL-3.0-or-later",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/nuogz/biffer.git"
+		"url": "git+https://github.com/danor-lib/biffer.git"
 	},
 	"private": false,
+	"sideEffects": false,
 	"type": "module",
 	"typesSource": [
 		"node"
 	],
-	"sideEffects": false,
 	"engines": {
-		"node": ">=20"
+		"node": ">=24"
 	},
-	"main": "./index.js",
 	"files": [
 		"index.js",
-		"locale/**",
+		"src/**/*.js",
 		"types/**"
 	],
-	"typings": "./types/index.d.ts",
-	"scripts": {
-		"declare": "tsc"
-	},
+	"main": "./index.js",
+	"types": "./types/index.d.ts",
 	"dependencies": {
-		"@nuogz/i18n": "^3.7.4"
+		"@danor-lib/error": "^1.0.0"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.9.1",
-		"@stylistic/eslint-plugin-js": "^2.6.4",
-		"@types/node": "^20.16.1",
-		"eslint": "^9.9.1",
-		"globals": "^15.9.0",
-		"typescript": "^5.5.4"
+		"@eslint/js": "^10.0.1",
+		"@stylistic/eslint-plugin": "^5.10.0",
+		"@types/node": "^24.12.2",
+		"eslint": "^10.2.0",
+		"globals": "^17.5.0"
 	}
 }

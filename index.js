@@ -1,22 +1,14 @@
-import { closeSync, fstatSync, openSync, readSync } from 'fs';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { closeSync, fstatSync, openSync, readSync } from 'node:fs';
 
-import { loadI18NResource, TT } from '@nuogz/i18n';
+import { RichError } from '@danor-lib/error';
 
-
-
-loadI18NResource('@nuogz/biffer', resolve(dirname(fileURLToPath(import.meta.url)), 'locale'));
-
-const { T } = TT('@nuogz/biffer');
+import { T } from './src/texter.js';
 
 
 
 export default class Biffer {
-	/**
-	 * sizes of format char
-	 */
-	static dictSize = {
+	/** Sizes (in bytes) of each struct character type. */
+	static sizes$charStruct = {
 		x: 1, // padding
 
 		s: 1, // varying string
@@ -42,8 +34,8 @@ export default class Biffer {
 	};
 
 	/**
-	 * @param {string[]} chars format chars
-	 * @returns {['LE' | 'BE', boolean]} `LE` or `BE`
+	 * @param {string[]} chars - Struct characters array.
+	 * @returns {['LE' | 'BE', boolean]} - The endianness and a boolean indicating if an endian specifier was present.
 	 */
 	static #parseEndian(chars) {
 		const char = chars[0];
@@ -55,11 +47,11 @@ export default class Biffer {
 	}
 
 	/**
-	 * @param {string} count_char
-	 * @returns {[string, number, number]}
+	 * @param {string} stringCountChar - A string like "4i" or "c".
+	 * @returns {[string, number, number]} - [charType, count, sizeInBytes]
 	 */
-	static #parseChar(count_char) {
-		let [count, char] = count_char.split(/(?=[A-Za-z])/);
+	static #parseStructChar(stringCountChar) {
+		let [count, char] = stringCountChar.split(/(?=[A-Za-z])/);
 
 		if(!char) {
 			char = count;
@@ -67,32 +59,32 @@ export default class Biffer {
 			count = 1;
 		}
 
-		return [char, ~~count, Biffer.dictSize[char]];
+		return [char, ~~count, Biffer.sizes$charStruct[char]];
 	}
 
 	/**
-	 * @param {string} format
-	 * @param {Buffer} buffer
-	 * @param {number} [start=0]
-	 * @returns {[(number|bigint|string)[], number]}
+	 * @param {string} struct - Format string (e.g., ">4i2s").
+	 * @param {Buffer} buffer - The buffer to unpack from.
+	 * @param {number} [cursor=0] - Starting position in buffer.
+	 * @returns {[(number|bigint|string)[], number]} - [unpackedData, bytesRead]
 	 */
-	static unpack(format, buffer, start = 0) {
-		const startFirst = start;
+	static unpack(struct, buffer, cursor = 0) {
+		const positionFirst = cursor;
 
-		const chars = format.match(/(^[<>])|\d*[a-zA-Z]/g);
+		const chars = struct.match(/(^[<>])|\d*[a-zA-Z]/g);
 
 		const [endian, isMatchEndian] = Biffer.#parseEndian(chars);
-
 		if(isMatchEndian) { chars.shift(); }
 
+
 		const dataRead = [];
-		chars.forEach(charRaw => {
-			const [charType, count, sizeType] = Biffer.#parseChar(charRaw);
+		chars.forEach((charRaw, indexChar) => {
+			const [charType, count, sizeType] = Biffer.#parseStructChar(charRaw);
 
 			// varying string
 			if(charType == 's') {
 				dataRead.push(
-					buffer.toString('utf8', start, start + count)
+					buffer.toString('utf8', cursor, cursor + count)
 				);
 			}
 			// char
@@ -101,7 +93,7 @@ export default class Biffer {
 
 				while(remain > 0) {
 					dataRead.push(
-						String.fromCharCode(buffer[start + sizeType * (count - remain--)])
+						String.fromCharCode(buffer[cursor + sizeType * (count - remain--)])
 					);
 				}
 			}
@@ -117,7 +109,7 @@ export default class Biffer {
 
 				while(remain > 0) {
 					dataRead.push(
-						buffer[`read${big}${signed}Int${sizeBytes}${markEndian}`](start + sizeType * (count - remain--))
+						buffer[`read${big}${signed}Int${sizeBytes}${markEndian}`](cursor + sizeType * (count - remain--))
 					);
 				}
 			}
@@ -130,29 +122,33 @@ export default class Biffer {
 				let remain = count;
 				while(remain > 0) {
 					dataRead.push(
-						buffer[`read${type}${markEndian}`](start + sizeType * (count - remain--))
+						buffer[`read${type}${markEndian}`](cursor + sizeType * (count - remain--))
 					);
 				}
 			}
 			// padding
 			else if(charType != 'x') {
-				throw TypeError(T('invalid-format-char', { value: charType }, 'Biffer.unpack'));
+				throw RichError(T.invalidStructChar(charType), {
+					code: 'invalid-struct-char', at: 'Biffer.unpack',
+					data: { char: charType, indexChar, chars, struct },
+				});
 			}
 
 
-			start += sizeType * count;
+			cursor += sizeType * count;
 		});
 
-		return [dataRead, start - startFirst];
+		return [dataRead, cursor - positionFirst];
 	}
 
 	/**
+	 * Calculates the total size in bytes of the given struct format.
 	 *
-	 * @param {string} format
-	 * @returns {number}
+	 * @param {string} struct - Format string.
+	 * @returns {number} - Total size in bytes.
 	 */
-	static calc(format) {
-		const chars = format.match(/(^[<>])|\d*[a-zA-Z]/g);
+	static calc(struct) {
+		const chars = struct.match(/(^[<>])|\d*[a-zA-Z]/g);
 
 		const [, isMatchEndian] = Biffer.#parseEndian(chars);
 
@@ -160,13 +156,16 @@ export default class Biffer {
 
 		let length = 0;
 
-		chars.forEach(charRaw => {
-			const [char, count] = Biffer.#parseChar(charRaw);
+		chars.forEach((charRaw, indexChar) => {
+			const [char, count] = Biffer.#parseStructChar(charRaw);
 
-			const len = Biffer.dictSize[char];
+			const len = Biffer.sizes$charStruct[char];
 
 			if(!len) {
-				throw TypeError(T('invalid-format-char', { value: char }, 'Biffer.calc'));
+				throw RichError(T.invalidStructChar(char), {
+					code: 'invalid-struct-char', at: 'Biffer.calc',
+					data: { char, indexChar, chars, struct },
+				});
 			}
 			else {
 				length += len * (~~count || 4);
@@ -179,46 +178,66 @@ export default class Biffer {
 
 
 	/**
-	 * Target buffer or target file descriptor
+	 * The underlying buffer or file descriptor.
 	 * @type {Buffer|number}
-	 * */
+	 */
 	#target;
+	/**
+	 * The underlying buffer or file descriptor.
+	 * @type {Buffer|number}
+	 */
 	get target() { return this.#target; }
 
 	/**
-	 * File path (if pass file path when construct)
+	 * File path if constructed from a file path.
 	 * @type {String}
-	 * */
+	 */
 	path;
 
 	/**
-	 * Postion of used bytes
+	 * Current read/write position (in bytes).
 	 * @type {number}
-	 * */
-	#pos = 0;
-	get pos() { return this.#pos; }
+	 */
+	#cursor = 0;
+	/**
+	 * Current read/write position (in bytes).
+	 * @type {number}
+	 */
+	get cursor() { return this.#cursor; }
 
 	/**
-	 * Buffer's length
+	 * Total length (in bytes) of the target.
 	 * @type {number}
-	 * */
+	 */
 	#length;
+	/**
+	 * Total length (in bytes) of the target.
+	 * @type {number}
+	 */
 	get length() { return this.#length; }
 
 	/**
-	 * Indicates whether Biffer is using a file descriptor
+	 * Indicates whether Biffer is using a file descriptor.
 	 * @type {number}
-	 * */
+	 */
 	#usingFileDescriptor = false;
+	/**
+	 * Indicates whether Biffer is using a file descriptor.
+	 * @type {number}
+	 */
 	get usingFileDescriptor() { return this.#usingFileDescriptor; }
 
 
 
 	/**
-	 * An easy wrapper for NodeJS Buffer
-	 * @param {Buffer|string|number} raw `buffer` or `file path`
+	 * A convenient wrapper around Node.js Buffer with file descriptor support.
+	 * @param {Biffer|Buffer|string|number} raw - A Biffer instance, Buffer, file descriptor, or file path.
 	 */
 	constructor(raw) {
+		if(raw instanceof Biffer) {
+			raw = raw.path || raw.target;
+		}
+
 		if(raw instanceof Buffer) {
 			this.#target = raw;
 		}
@@ -235,7 +254,10 @@ export default class Biffer {
 			this.path = raw;
 		}
 		else {
-			throw TypeError(T('invalid-constructor-raw', { value: raw }, 'Biffer.constructor'));
+			throw RichError(T.invalidConstructorRaw(raw), {
+				code: 'invalid-constructor-raw', at: 'Biffer.constructor',
+				data: raw,
+			});
 		}
 
 
@@ -244,92 +266,144 @@ export default class Biffer {
 			this.#target.length;
 	}
 
+
 	/**
-	 * Unpack data according format string
-	 * - `<` small endian (ONLY at the first, default endian if not set)
-	 * - `>` big endian (ONLY at the first)
-	 * @param {string} format
+	 * Creates a clone of this Biffer instance.
+	 * @returns {Biffer}
+	 */
+	clone() {
+		return new Biffer(this);
+	}
+
+
+	/**
+	 * Unpack data according to the struct format string.
+	 * - For the characters `B`, `H`, `I`, `L`, and `Q`, their lowercase versions correspond to the signed versions.
+	 * - The **endian** char only works at the **beginning** of the string.
+	 *
+	 * | char | size | meaning                 |
+	 * | :--- | :--- | :---------------------  |
+	 * | <    | -    | little endian (default) |
+	 * | >    | -    | big endian              |
+	 * | x    | 1    | padding                 |
+	 * | s    | 1    | varying string          |
+	 * | c    | 1    | char                    |
+	 * | f    | 4    | float                   |
+	 * | d    | 8    | double                  |
+	 * | B    | 1    | char (unsigned)         |
+	 * | H    | 2    | short int (unsigned)    |
+	 * | I    | 4    | int (unsigned)          |
+	 * | L    | 4    | long int (unsigned)     |
+	 * | Q    | 8    | quad int (unsigned)     |
+	 *
+	 * @param {string} struct - Format string describing the structure.
 	 * @returns {(number|bigint|string)[]}
 	 */
-	unpack(format) {
-		const sizeData = Biffer.calc(format, this.locale);
+	unpack(struct) {
+		const sizeData = Biffer.calc(struct);
 
 		let buffer = this.target;
 		if(this.usingFileDescriptor) {
-			readSync(this.target, buffer = Buffer.alloc(sizeData), 0, sizeData, this.pos);
+			readSync(this.target, buffer = Buffer.alloc(sizeData), 0, sizeData, this.cursor);
 		}
 
-		const [data, byteRead] = Biffer.unpack(format, buffer, this.usingFileDescriptor ? 0 : this.pos, this.locale);
+		const [data, byteRead] = Biffer.unpack(struct, buffer, this.usingFileDescriptor ? 0 : this.cursor);
 
-		this.#pos += byteRead;
+		this.#cursor += byteRead;
 
 		return data;
 	}
 
 
 	/**
-	 * Current position
+	 * Returns the current cursor position.
 	 * @returns {number}
 	 */
 	tell() {
-		return this.pos;
+		return this.cursor;
 	}
 	/**
-	 * Set new position
-	 * @param {number} position new position
-	 * @returns {number}
+	 * Moves the cursor to a new position.
+	 * @param {number} cursor - The new position.
+	 * @returns {number} - The new cursor position.
 	 */
-	seek(position) {
-		if(typeof position != 'number') { throw TypeError(T('invalid-seek-position', { value: position }, 'Biffer().seek')); }
+	seek(cursor) {
+		if(typeof cursor != 'number') {
+			throw RichError(T.invalidCursor(cursor), {
+				code: 'invalid-seek-position', at: 'Biffer#seek',
+				data: { position: cursor, biffer: this },
+			});
+		}
 
-		return this.#pos = position;
+		return this.#cursor = cursor;
 	}
 	/**
-	 * Offset position. negative number is valid
-	 * @param {number} offset
-	 * @returns {number}
+	 * Moves the cursor by the specified offset (negative values allowed).
+	 * @param {number} size - Offset to move by.
+	 * @returns {number} - The new cursor position.
 	 */
-	skip(offset) {
-		if(typeof offset != 'number') { throw TypeError(T('invalid-skip-offset', { value: offset }, 'Biffer().skip')); }
+	skip(size) {
+		if(typeof size != 'number') {
+			throw RichError(T.invalidSzie(size), {
+				code: 'invalid-skip-offset', at: 'Biffer#skip',
+				data: { offset: size, biffer: this },
+			});
+		}
 
-		return this.#pos += offset;
+		return this.#cursor += size;
 	}
 
 	/**
-	 * Slice buffer from current position and move position
-	 * @param {number} size
-	 * @returns {Buffer}
+	 * Extracts a slice of the buffer starting from the current cursor position.
+	 * @param {number} size - Number of bytes to slice.
+	 * @param {Object} options - Options object.
+	 * @param {boolean} options.wrap - If true, returns a Biffer instance; otherwise returns a raw Buffer.
+	 * @param {boolean} options.seek - If true, advances the cursor by the slice size.
+	 * @returns {Biffer|Buffer}
 	 */
-	slice(size) {
-		if(typeof size != 'number') { throw TypeError(T('invalid-slice-size', { value: size }, 'Biffer().slice')); }
+	slice(size, options) {
+		if(typeof size != 'number') {
+			throw RichError(T.invalidSzie(size), {
+				code: 'invalid-slice-size', at: 'Biffer#slice(1:size)',
+				data: { size, biffer: this },
+			});
+		}
+		if(options && typeof options != 'object') {
+			throw RichError(T.invalidOptions(options), {
+				code: 'invalid-slice-options', at: 'Biffer#slice(2:options)',
+				data: { options, biffer: this },
+			});
+		}
 
-		const end = this.pos + size;
+
+		const willWrap = 'wrap' in options && options.wrap !== undefined ? Boolean(options.wrap) : true;
+		const willSeek = 'seek' in options && options.seek !== undefined ? Boolean(options.seek) : true;
+
+
+		const dead = this.cursor + size;
 
 		const buffer = this.usingFileDescriptor ?
 			Buffer.alloc(size) :
-			this.target.slice(this.pos, end);
+			this.target.subarray(this.cursor, dead);
 
 		if(this.usingFileDescriptor) {
-			readSync(this.target, buffer, 0, size, this.pos);
+			readSync(this.target, buffer, 0, size, this.cursor);
 		}
 
-		this.#pos = end;
 
-		return buffer;
-	}
-	/**
-	 * Same for `.slice`, but wrap by new Biffer
-	 * @param {number} size
-	 * @returns {Biffer}
-	 */
-	sub(size) {
-		return new Biffer(this.slice(size));
+		if(willSeek) {
+			this.#cursor = dead;
+		}
+
+
+		return willWrap ? new Biffer(buffer) : buffer;
 	}
 
+
 	/**
-	 * Returns the position of the first occurrence on buffer data
-	 * @param {any} data data would pass to `Buffer.from`
-	 * @returns {number} offset
+	 * Finds the first occurrence of the given data in the buffer starting from the current cursor.
+	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
 	 */
 	find(data) {
 		const bufferData = Buffer.from(data);
@@ -338,11 +412,11 @@ export default class Biffer {
 
 		if(this.usingFileDescriptor) {
 			const buffer = Buffer.alloc(1024 * 1024 + bufferData.length);
-			const lengthAll = this.length;
+			const lengthFull = this.length;
 			const lengthRead = buffer.length;
-			let pos = this.pos;
+			let pos = this.cursor;
 
-			while(pos < lengthAll) {
+			while(pos < lengthFull) {
 				readSync(this.target, buffer, 0, lengthRead, pos);
 
 				const offsetTemp = buffer.indexOf(bufferData);
@@ -357,18 +431,18 @@ export default class Biffer {
 			}
 		}
 		else {
-			offset = this.target.indexOf(bufferData, this.pos);
+			offset = this.target.indexOf(bufferData, this.cursor);
 		}
 
 
-		return offset > -1 ? this.#pos = offset : offset;
+		return offset > -1 ? this.#cursor = offset : offset;
 	}
 	/**
-	 * Seek to start then find data position
-	 * @param {any} data data would pass to `Buffer.from`
-	 * @returns {number} offset
+	 * Seeks to the beginning and then finds the first occurrence of the given data.
+	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
 	 */
-	findFromStart(data) {
+	findFromHead(data) {
 		this.seek(0);
 
 		return this.find(data);
@@ -376,28 +450,29 @@ export default class Biffer {
 
 
 	/**
-	 * Unpack a string whose schema is `string length + string data`
-	 * @param {string} format the format of string length, default is `L`
+	 * Unpacks a string that is prefixed by its length (length field + string data).
+	 * @param {string} charLength - The struct character for the length field (default is `'L'`).
 	 * @returns {string}
 	 */
-	unpackString(format = 'L') {
-		const [length] = this.unpack(format);
+	unpackString(charLength = 'L') {
+		const [length] = this.unpack(charLength);
 
 		const result = this.slice(length);
 
 		return String(result);
 	}
 
+
 	/**
-	 * Returns the position reach the last of buffer data or not
+	 * Checks if the cursor has reached or passed the end of the data.
 	 * @returns {boolean}
 	 */
-	isEnd() {
-		return this.pos >= this.length;
+	isReach() {
+		return this.cursor >= this.length;
 	}
 
 	/**
-	 * Close target file descriptor (if avaliable)
+	 * Closes the underlying file descriptor if it is open.
 	 */
 	close() {
 		if(this.#usingFileDescriptor && typeof this.#target == 'number') {
@@ -411,4 +486,4 @@ export default class Biffer {
 	}
 }
 
-Object.freeze(Biffer.dictSize);
+Object.freeze(Biffer.sizes$charStruct);

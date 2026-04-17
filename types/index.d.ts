@@ -1,124 +1,191 @@
 export default class Biffer {
-    /**
-     * sizes of format char
-     */
-    static dictSize: {
-        x: number;
-        s: number;
-        c: number;
-        b: number;
-        B: number;
-        h: number;
-        H: number;
-        i: number;
-        I: number;
-        l: number;
-        L: number;
-        q: number;
-        Q: number;
-        f: number;
-        d: number;
-    };
-    /**
-     * @param {string[]} chars format chars
-     * @returns {['LE' | 'BE', boolean]} `LE` or `BE`
-     */
-    static "__#1@#parseEndian"(chars: string[]): ["LE" | "BE", boolean];
-    /**
-     * @param {string} count_char
-     * @returns {[string, number, number]}
-     */
-    static "__#1@#parseChar"(count_char: string): [string, number, number];
-    /**
-     * @param {string} format
-     * @param {Buffer} buffer
-     * @param {number} [start=0]
-     * @returns {[(number|bigint|string)[], number]}
-     */
-    static unpack(format: string, buffer: Buffer, start?: number | undefined): [(number | bigint | string)[], number];
-    /**
-     *
-     * @param {string} format
-     * @returns {number}
-     */
-    static calc(format: string): number;
-    /**
-     * An easy wrapper for NodeJS Buffer
-     * @param {Buffer|string|number} raw `buffer` or `file path`
-     */
-    constructor(raw: Buffer | string | number);
-    get target(): number | Buffer;
-    /**
-     * File path (if pass file path when construct)
-     * @type {String}
-     * */
-    path: string;
-    get pos(): number;
-    get length(): number;
-    get usingFileDescriptor(): number;
-    /**
-     * Unpack data according format string
-     * - `<` small endian (ONLY at the first, default endian if not set)
-     * - `>` big endian (ONLY at the first)
-     * @param {string} format
-     * @returns {(number|bigint|string)[]}
-     */
-    unpack(format: string): (number | bigint | string)[];
-    /**
-     * Current position
-     * @returns {number}
-     */
-    tell(): number;
-    /**
-     * Set new position
-     * @param {number} position new position
-     * @returns {number}
-     */
-    seek(position: number): number;
-    /**
-     * Offset position. negative number is valid
-     * @param {number} offset
-     * @returns {number}
-     */
-    skip(offset: number): number;
-    /**
-     * Slice buffer from current position and move position
-     * @param {number} size
-     * @returns {Buffer}
-     */
-    slice(size: number): Buffer;
-    /**
-     * Same for `.slice`, but wrap by new Biffer
-     * @param {number} size
-     * @returns {Biffer}
-     */
-    sub(size: number): Biffer;
-    /**
-     * Returns the position of the first occurrence on buffer data
-     * @param {any} data data would pass to `Buffer.from`
-     * @returns {number} offset
-     */
-    find(data: any): number;
-    /**
-     * Seek to start then find data position
-     * @param {any} data data would pass to `Buffer.from`
-     * @returns {number} offset
-     */
-    findFromStart(data: any): number;
-    /**
-     * Unpack a string whose schema is `string length + string data`
-     * @param {string} format the format of string length, default is `L`
-     * @returns {string}
-     */
-    unpackString(format?: string): string;
-    /**
-     * Returns the position reach the last of buffer data or not
-     * @returns {boolean}
-     */
-    isEnd(): boolean;
-    /**
-     * Close target file descriptor (if avaliable)
-     */
-    close(): void;
-    #private;
+	/** Sizes (in bytes) of each struct character type. */
+	static sizes$charStruct: {
+		x: number;
+
+		s: number;
+		c: number;
+
+		b: number;
+		B: number;
+
+		h: number;
+		H: number;
+
+		i: number;
+		I: number;
+
+		l: number;
+		L: number;
+
+		q: number;
+		Q: number;
+
+		f: number;
+		d: number;
+	};
+
+
+	/**
+	 * @param {string[]} chars - Struct characters array.
+	 * @returns {['LE' | 'BE', boolean]} - The endianness and a boolean indicating if an endian specifier was present.
+	 */
+	static #parseEndian(chars: string[]): ["LE" | "BE", boolean];
+
+	/**
+	 * @param {string} stringCountChar - A string like "4i" or "c".
+	 * @returns {[string, number, number]} - [charType, count, sizeInBytes]
+	 */
+	static #parseStructChar(stringCountChar: string): [string, number, number];
+
+	/**
+	 * @param {string} struct - Format string (e.g., ">4i2s").
+	 * @param {Buffer} buffer - The buffer to unpack from.
+	 * @param {number} [cursor=0] - Starting position in buffer.
+	 * @returns {[(number|bigint|string)[], number]} - [unpackedData, bytesRead]
+	 */
+	static unpack(struct: string, buffer: Buffer, cursor?: number): [(number | bigint | string)[], number];
+	/**
+	 * Calculates the total size in bytes of the given struct format.
+	 *
+	 * @param {string} struct - Format string.
+	 * @returns {number} - Total size in bytes.
+	 */
+	static calc(struct: string): number;
+
+
+	/**
+	 * A convenient wrapper around Node.js Buffer with file descriptor support.
+	 * @param {Biffer|Buffer|string|number} raw - A Biffer instance, Buffer, file descriptor, or file path.
+	 */
+	constructor(raw: Biffer | Buffer | string | number);
+
+
+	/**
+	 * The underlying buffer or file descriptor.
+	 * @type {Buffer|number}
+	 */
+	get target(): Buffer | number;
+
+	/**
+	 * File path if constructed from a file path.
+	 * @type {String}
+	 */
+	path: string;
+
+	/**
+	 * Current read/write position (in bytes).
+	 * @type {number}
+	 */
+	get cursor(): number;
+
+	/**
+	 * Total length (in bytes) of the target.
+	 * @type {number}
+	 */
+	get length(): number;
+
+	/**
+	 * Indicates whether Biffer is using a file descriptor.
+	 * @type {number}
+	 */
+	get usingFileDescriptor(): number;
+
+
+	/**
+	 * Creates a clone of this Biffer instance.
+	 * @returns {Biffer}
+	 */
+	clone(): Biffer;
+
+
+	/**
+	 * Unpack data according to the struct format string.
+	 * - For the characters `B`, `H`, `I`, `L`, and `Q`, their lowercase versions correspond to the signed versions.
+	 * - The **endian** char only works at the **beginning** of the string.
+	 *
+	 * | char | size | meaning                 |
+	 * | :--- | :--- | :---------------------  |
+	 * | <    | -    | little endian (default) |
+	 * | >    | -    | big endian              |
+	 * | x    | 1    | padding                 |
+	 * | s    | 1    | varying string          |
+	 * | c    | 1    | char                    |
+	 * | f    | 4    | float                   |
+	 * | d    | 8    | double                  |
+	 * | B    | 1    | char (unsigned)         |
+	 * | H    | 2    | short int (unsigned)    |
+	 * | I    | 4    | int (unsigned)          |
+	 * | L    | 4    | long int (unsigned)     |
+	 * | Q    | 8    | quad int (unsigned)     |
+	 *
+	 * @param {string} struct - Format string describing the structure.
+	 * @returns {(number|bigint|string)[]}
+	 */
+	unpack(struct: string): (number | bigint | string)[];
+
+
+	/**
+	 * Returns the current cursor position.
+	 * @returns {number}
+	 */
+	tell(): number;
+	/**
+	 * Moves the cursor to a new position.
+	 * @param {number} cursor - The new position.
+	 * @returns {number} - The new cursor position.
+	 */
+	seek(cursor: number): number;
+	/**
+	 * Moves the cursor by the specified offset (negative values allowed).
+	 * @param {number} size - Offset to move by.
+	 * @returns {number} - The new cursor position.
+	 */
+	skip(size: number): number;
+
+	/**
+	 * Extracts a slice of the buffer starting from the current cursor position.
+	 * @param {number} size - Number of bytes to slice.
+	 * @param {Object} options - Options object.
+	 * @param {boolean} options.wrap - If true, returns a Biffer instance; otherwise returns a raw Buffer.
+	 * @param {boolean} options.seek - If true, advances the cursor by the slice size.
+	 * @returns {Biffer|Buffer}
+	 */
+	slice(size: number, options: {
+		wrap: boolean;
+		seek: boolean;
+	}): Biffer | Buffer;
+
+	/**
+	 * Finds the first occurrence of the given data in the buffer starting from the current cursor.
+	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
+	 */
+	find(data: any): number;
+	/**
+	 * Seeks to the beginning and then finds the first occurrence of the given data.
+	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
+	 */
+	findFromHead(data: any): number;
+
+	/**
+	 * Unpacks a string that is prefixed by its length (length field + string data).
+	 * @param {string} charLength - The struct character for the length field (default is `'L'`).
+	 * @returns {string}
+	 */
+	unpackString(charLength?: string): string;
+
+	/**
+	 * Checks if the cursor has reached or passed the end of the data.
+	 * @returns {boolean}
+	 */
+	isReach(): boolean;
+
+	/**
+	 * Closes the underlying file descriptor if it is open.
+	 */
+	close(): void;
+
+	#private;
 }

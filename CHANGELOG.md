@@ -1,5 +1,26 @@
 # CHANGELOG
 
+## v3.0.0 - 2026.04.17 15
+* refactor!: rename package from `@nuogz/biffer` to `@danor-lib/biffer`
+* refactor!: refactor `#slice()` method with new options parameter
+* refactor!: remove `#sub()` method . its functionality is merged into `#slice()`
+* feat: Biffer constructor to support cloning Biffer instances
+* feat: add `#clone()` method to create independent Biffer instances
+* refactor!: rename property `.dictSize` to `.sizes$charStruct`
+* refactor!: rename property `.pos` to `.cursor`
+* refactor!: rename method `.#parseChar` to `.#parseStructChar`
+* refactor!: rename method `#findFromStart()` to `#findFromHead()`
+* refactor!: rename method `#isEnd()` to `#isReach()`
+* docs: completely rewrite README with detailed API documentation
+* docs: add English version README.en.md
+* break!: remove infrequently used `@nuogz/i18n`
+* refactor: refactor error handling with `@danor-lib/error`
+* feat: add `src/texter.js` for styled error messages
+* regular!: bump up Node.js requirement to `>=24`
+* regular: update enviroment
+* regular: bump up dependencies
+
+
 ## v2.7.1 - 2024.08.26 11
 * refactor: renew codes to adapt to latest `@nuogz/i18n`
 * docs: renew locale with latest `@nuogz/i18n`
