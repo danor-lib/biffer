@@ -1,9 +1,0 @@
-{
-	"ArgumentError": {
-		"invalid-format-char": "each character of ~[format] argument must be one of ~{xscfdbhilqBHILQ}, value {{-value,valueType}}",
-		"invalid-constructor-raw": "~[raw] argument must be one of type ~{string}, ~{number} or an instance of ~{Buffer}, value {{-value,valueType}}",
-		"invalid-seek-position": "~[position] argument must be of type ~{number}, value {{-value,valueType}}",
-		"invalid-skip-offset": "~[offset] argument must be of type ~{number}, value {{-value,valueType}}",
-		"invalid-slice-size": "~[size] argument must be of type ~{number}, value {{-value,valueType}}"
-	}
-}
