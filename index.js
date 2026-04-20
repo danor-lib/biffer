@@ -1,4 +1,5 @@
 import { closeSync, fstatSync, openSync, readSync } from 'node:fs';
+import { inspect } from 'node:util';
 
 import { RichError } from '@danor-lib/error';
 
@@ -218,12 +219,12 @@ export default class Biffer {
 
 	/**
 	 * Indicates whether Biffer is using a file descriptor.
-	 * @type {number}
+	 * @type {boolean}
 	 */
 	#usingFileDescriptor = false;
 	/**
 	 * Indicates whether Biffer is using a file descriptor.
-	 * @type {number}
+	 * @type {boolean}
 	 */
 	get usingFileDescriptor() { return this.#usingFileDescriptor; }
 
@@ -376,8 +377,8 @@ export default class Biffer {
 		}
 
 
-		const willWrap = 'wrap' in options && options.wrap !== undefined ? Boolean(options.wrap) : true;
-		const willSeek = 'seek' in options && options.seek !== undefined ? Boolean(options.seek) : true;
+		const willWrap = options && 'wrap' in options && options.wrap !== undefined ? Boolean(options.wrap) : true;
+		const willSeek = options && 'seek' in options && options.seek !== undefined ? Boolean(options.seek) : true;
 
 
 		const dead = this.cursor + size;
@@ -483,6 +484,15 @@ export default class Biffer {
 				if(error.code != 'EBADF') { throw error; }
 			}
 		}
+	}
+
+
+	get [Symbol.toStringTag]() { return 'Biffer'; }
+
+	[inspect.custom]() {
+		return this.#usingFileDescriptor
+			? `<Biffer${this.path ? ` path:${this.path}` : ''} cursor/length:${this.#cursor}/${this.#length})>`
+			: `<Biffer cursor/length:${this.#cursor}/${this.#length} buffer:${this.#target.inspect().replace(/^<Buffer\s|>$/g, '')}>`;
 	}
 }
 

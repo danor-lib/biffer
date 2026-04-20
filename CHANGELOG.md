@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v3.0.1 - 2026.04.20 16
+* fix: fix issue of incorrectly using the `in` operator when no option argument is passed to `#slice()`
+* feat: add helper display functions `get [Symbol.toStringTag]()` and `[node:util.inspect.custom]()` inside the Biffer class to show Biffer state more conveniently
+* regular: bump up dependencies
+
+
 ## v3.0.0 - 2026.04.17 15
 * refactor!: rename package from `@nuogz/biffer` to `@danor-lib/biffer`
 * refactor!: refactor `#slice()` method with new options parameter

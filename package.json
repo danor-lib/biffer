@@ -1,6 +1,6 @@
 {
 	"name": "@danor-lib/biffer",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "Binary data unpack library based on Node.js Buffer",
 	"author": "DanoR",
 	"license": "LGPL-3.0-or-later",
@@ -31,7 +31,7 @@
 		"@eslint/js": "^10.0.1",
 		"@stylistic/eslint-plugin": "^5.10.0",
 		"@types/node": "^24.12.2",
-		"eslint": "^10.2.0",
+		"eslint": "^10.2.1",
 		"globals": "^17.5.0"
 	}
 }
