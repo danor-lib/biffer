@@ -1,6 +1,6 @@
 {
 	"name": "@danor-lib/biffer",
-	"version": "3.0.1",
+	"version": "3.1.0",
 	"description": "Binary data unpack library based on Node.js Buffer",
 	"author": "DanoR",
 	"license": "LGPL-3.0-or-later",

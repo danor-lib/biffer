@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v3.1.0 - 2026.04.30 15
+* feat: `.unpackString()` supports returning Buffer directly to provide raw data for non-UTF-8 encoded strings
+* fix: fix the issue where the return value of `.unpackString()` is incorrect
+* docs: tweak jsdoc style
+* regular: bump up dependencies
+
+
 ## v3.0.1 - 2026.04.20 16
 * fix: fix issue of incorrectly using the `in` operator when no option argument is passed to `#slice()`
 * feat: add helper display functions `get [Symbol.toStringTag]()` and `[node:util.inspect.custom]()` inside the Biffer class to show Biffer state more conveniently
@@ -14,7 +21,7 @@
 * feat: add `#clone()` method to create independent Biffer instances
 * refactor!: rename property `.dictSize` to `.sizes$charStruct`
 * refactor!: rename property `.pos` to `.cursor`
-* refactor!: rename method `.#parseChar` to `.#parseStructChar`
+* refactor!: rename method `.#parseChar()` to `.#parseStructChar()`
 * refactor!: rename method `#findFromStart()` to `#findFromHead()`
 * refactor!: rename method `#isEnd()` to `#isReach()`
 * docs: completely rewrite README with detailed API documentation

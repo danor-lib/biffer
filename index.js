@@ -35,8 +35,8 @@ export default class Biffer {
 	};
 
 	/**
-	 * @param {string[]} chars - Struct characters array.
-	 * @returns {['LE' | 'BE', boolean]} - The endianness and a boolean indicating if an endian specifier was present.
+	 * @param {string[]} chars Struct characters array.
+	 * @returns {['LE'|'BE', boolean]} The endianness and a boolean indicating if an endian specifier was present.
 	 */
 	static #parseEndian(chars) {
 		const char = chars[0];
@@ -48,8 +48,8 @@ export default class Biffer {
 	}
 
 	/**
-	 * @param {string} stringCountChar - A string like "4i" or "c".
-	 * @returns {[string, number, number]} - [charType, count, sizeInBytes]
+	 * @param {string} stringCountChar A string like "4i" or "c".
+	 * @returns {[string, number, number]} [charType, count, sizeInBytes]
 	 */
 	static #parseStructChar(stringCountChar) {
 		let [count, char] = stringCountChar.split(/(?=[A-Za-z])/);
@@ -64,10 +64,10 @@ export default class Biffer {
 	}
 
 	/**
-	 * @param {string} struct - Format string (e.g., ">4i2s").
-	 * @param {Buffer} buffer - The buffer to unpack from.
-	 * @param {number} [cursor=0] - Starting position in buffer.
-	 * @returns {[(number|bigint|string)[], number]} - [unpackedData, bytesRead]
+	 * @param {string} struct Format string (e.g., ">4i2s").
+	 * @param {Buffer} buffer The buffer to unpack from.
+	 * @param {number} [cursor=0] Starting position in buffer.
+	 * @returns {[(number|bigint|string)[], number]} [unpackedData, bytesRead]
 	 */
 	static unpack(struct, buffer, cursor = 0) {
 		const positionFirst = cursor;
@@ -145,8 +145,8 @@ export default class Biffer {
 	/**
 	 * Calculates the total size in bytes of the given struct format.
 	 *
-	 * @param {string} struct - Format string.
-	 * @returns {number} - Total size in bytes.
+	 * @param {string} struct Format string.
+	 * @returns {number} Total size in bytes.
 	 */
 	static calc(struct) {
 		const chars = struct.match(/(^[<>])|\d*[a-zA-Z]/g);
@@ -232,7 +232,7 @@ export default class Biffer {
 
 	/**
 	 * A convenient wrapper around Node.js Buffer with file descriptor support.
-	 * @param {Biffer|Buffer|string|number} raw - A Biffer instance, Buffer, file descriptor, or file path.
+	 * @param {Biffer|Buffer|string|number} raw A Biffer instance, Buffer, file descriptor, or file path.
 	 */
 	constructor(raw) {
 		if(raw instanceof Biffer) {
@@ -297,7 +297,7 @@ export default class Biffer {
 	 * | L    | 4    | long int (unsigned)     |
 	 * | Q    | 8    | quad int (unsigned)     |
 	 *
-	 * @param {string} struct - Format string describing the structure.
+	 * @param {string} struct Format string describing the structure.
 	 * @returns {(number|bigint|string)[]}
 	 */
 	unpack(struct) {
@@ -325,8 +325,8 @@ export default class Biffer {
 	}
 	/**
 	 * Moves the cursor to a new position.
-	 * @param {number} cursor - The new position.
-	 * @returns {number} - The new cursor position.
+	 * @param {number} cursor The new position.
+	 * @returns {number} The new cursor position.
 	 */
 	seek(cursor) {
 		if(typeof cursor != 'number') {
@@ -340,8 +340,8 @@ export default class Biffer {
 	}
 	/**
 	 * Moves the cursor by the specified offset (negative values allowed).
-	 * @param {number} size - Offset to move by.
-	 * @returns {number} - The new cursor position.
+	 * @param {number} size Offset to move by.
+	 * @returns {number} The new cursor position.
 	 */
 	skip(size) {
 		if(typeof size != 'number') {
@@ -356,10 +356,10 @@ export default class Biffer {
 
 	/**
 	 * Extracts a slice of the buffer starting from the current cursor position.
-	 * @param {number} size - Number of bytes to slice.
-	 * @param {Object} options - Options object.
-	 * @param {boolean} options.wrap - If true, returns a Biffer instance; otherwise returns a raw Buffer.
-	 * @param {boolean} options.seek - If true, advances the cursor by the slice size.
+	 * @param {number} size Number of bytes to slice.
+	 * @param {Object} options Options object.
+	 * @param {boolean} options.wrap If true, returns a Biffer instance; otherwise returns a raw Buffer.
+	 * @param {boolean} options.seek If true, advances the cursor by the slice size.
 	 * @returns {Biffer|Buffer}
 	 */
 	slice(size, options) {
@@ -403,8 +403,8 @@ export default class Biffer {
 
 	/**
 	 * Finds the first occurrence of the given data in the buffer starting from the current cursor.
-	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
-	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
+	 * @param {any} data Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} The offset of the first occurrence, or -1 if not found.
 	 */
 	find(data) {
 		const bufferData = Buffer.from(data);
@@ -440,8 +440,8 @@ export default class Biffer {
 	}
 	/**
 	 * Seeks to the beginning and then finds the first occurrence of the given data.
-	 * @param {any} data - Data to search for (will be passed to `Buffer.from`).
-	 * @returns {number} - The offset of the first occurrence, or -1 if not found.
+	 * @param {any} data Data to search for (will be passed to `Buffer.from`).
+	 * @returns {number} The offset of the first occurrence, or -1 if not found.
 	 */
 	findFromHead(data) {
 		this.seek(0);
@@ -452,15 +452,16 @@ export default class Biffer {
 
 	/**
 	 * Unpacks a string that is prefixed by its length (length field + string data).
-	 * @param {string} charLength - The struct character for the length field (default is `'L'`).
-	 * @returns {string}
+	 * @param {string} charLength The struct character for the length field (default is `'L'`).
+	 * @param {boolean} returnBuffer If true, returns a Buffer; otherwise returns a string (default is false).
+	 * @returns {string|Buffer}
 	 */
-	unpackString(charLength = 'L') {
+	unpackString(charLength = 'L', returnBuffer = false) {
 		const [length] = this.unpack(charLength);
 
-		const result = this.slice(length);
+		const result = this.slice(length, { wrap: false });
 
-		return String(result);
+		return returnBuffer ? result : String(result);
 	}
 
 
