@@ -1,5 +1,15 @@
 # CHANGELOG
 
+## v3.2.0 - 2026.05.25 16
+* refactor!: due to a change in design philosophy, remove all error message text
+  * in my design philosophy, an error should only contain a code and associated data. text-based message should be rendered by the terminal (including i18n and terminal highlighting)
+* docs: add error code reference table
+* regular!: bump up Node.js requirement to `>=26`
+  * this requirement does not mean the library cannot run on older versions of Node.js. it only indicates the major version I am currently using
+* regular: bump up dependencies
+  * bump up `@danor-lib/error` to `v2.x`
+
+
 ## v3.1.0 - 2026.04.30 15
 * feat: `.unpackString()` supports returning Buffer directly to provide raw data for non-UTF-8 encoded strings
 * fix: fix the issue where the return value of `.unpackString()` is incorrect

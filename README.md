@@ -275,3 +275,15 @@ console.log(biffer.unpack('<H')[0]); // 小端序：1
 // 假设结构为: char (1B) + padding (3B) + int (4B)
 const [char, int] = Biffer.unpack('c3xi', buffer);
 ```
+
+
+## 错误代码
+| 代码                    | 位置                    | 描述                   | 上下文数据                         |
+| :---------------------- | :---------------------- | :--------------------- | :--------------------------------- |
+| invalid-struct-char     | Biffer.unpack           | 格式字符非法           | { char, indexChar, chars, struct } |
+| invalid-struct-char     | Biffer.calc             | 格式字符非法           | { char, indexChar, chars, struct } |
+| invalid-constructor-raw | Biffer.constructor      | 构成函数参数raw非法    | raw                                |
+| invalid-seek-position   | Biffer#seek             | 将要移动的光标位置非法 | { position, biffer }               |
+| invalid-skip-offset     | Biffer#skip             | 将要跳过的光标位置非法 | { offset, biffer }                 |
+| invalid-slice-size      | Biffer#slice(1:size)    | 将要提取数据的尺寸非法 | { size, biffer }                   |
+| invalid-slice-options   | Biffer#slice(2:options) | 将要提取数据的选项非法 | { options, biffer }                |

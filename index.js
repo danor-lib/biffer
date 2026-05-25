@@ -3,8 +3,6 @@ import { inspect } from 'node:util';
 
 import { RichError } from '@danor-lib/error';
 
-import { T } from './src/texter.js';
-
 
 
 export default class Biffer {
@@ -129,7 +127,7 @@ export default class Biffer {
 			}
 			// padding
 			else if(charType != 'x') {
-				throw RichError(T.invalidStructChar(charType), {
+				throw new RichError({
 					code: 'invalid-struct-char', at: 'Biffer.unpack',
 					data: { char: charType, indexChar, chars, struct },
 				});
@@ -163,7 +161,7 @@ export default class Biffer {
 			const len = Biffer.sizes$charStruct[char];
 
 			if(!len) {
-				throw RichError(T.invalidStructChar(char), {
+				throw new RichError({
 					code: 'invalid-struct-char', at: 'Biffer.calc',
 					data: { char, indexChar, chars, struct },
 				});
@@ -255,7 +253,7 @@ export default class Biffer {
 			this.path = raw;
 		}
 		else {
-			throw RichError(T.invalidConstructorRaw(raw), {
+			throw new RichError({
 				code: 'invalid-constructor-raw', at: 'Biffer.constructor',
 				data: raw,
 			});
@@ -330,7 +328,7 @@ export default class Biffer {
 	 */
 	seek(cursor) {
 		if(typeof cursor != 'number') {
-			throw RichError(T.invalidCursor(cursor), {
+			throw new RichError({
 				code: 'invalid-seek-position', at: 'Biffer#seek',
 				data: { position: cursor, biffer: this },
 			});
@@ -345,7 +343,7 @@ export default class Biffer {
 	 */
 	skip(size) {
 		if(typeof size != 'number') {
-			throw RichError(T.invalidSzie(size), {
+			throw new RichError({
 				code: 'invalid-skip-offset', at: 'Biffer#skip',
 				data: { offset: size, biffer: this },
 			});
@@ -364,13 +362,13 @@ export default class Biffer {
 	 */
 	slice(size, options) {
 		if(typeof size != 'number') {
-			throw RichError(T.invalidSzie(size), {
+			throw new RichError({
 				code: 'invalid-slice-size', at: 'Biffer#slice(1:size)',
 				data: { size, biffer: this },
 			});
 		}
 		if(options && typeof options != 'object') {
-			throw RichError(T.invalidOptions(options), {
+			throw new RichError({
 				code: 'invalid-slice-options', at: 'Biffer#slice(2:options)',
 				data: { options, biffer: this },
 			});

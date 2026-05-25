@@ -274,3 +274,15 @@ The format character `x` is used to skip a specified number of bytes without pro
 // Suppose structure: char (1B) + padding (3B) + int (4B)
 const [char, int] = Biffer.unpack('c3xi', buffer);
 ```
+
+
+## Error Code
+| Code                    | Location                | Description                       | Context Data                       |
+| :---------------------- | :---------------------- | :-------------------------------- | :--------------------------------- |
+| invalid-struct-char     | Biffer.unpack           | Invalid struct character          | { char, indexChar, chars, struct } |
+| invalid-struct-char     | Biffer.calc             | Invalid struct character          | { char, indexChar, chars, struct } |
+| invalid-constructor-raw | Biffer.constructor      | Invalid constructor raw parameter | raw                                |
+| invalid-seek-position   | Biffer#seek             | Invalid seek position             | { position, biffer }               |
+| invalid-skip-offset     | Biffer#skip             | Invalid skip offset               | { offset, biffer }                 |
+| invalid-slice-size      | Biffer#slice(1:size)    | Invalid slice size                | { size, biffer }                   |
+| invalid-slice-options   | Biffer#slice(2:options) | Invalid slice options             | { options, biffer }                |
