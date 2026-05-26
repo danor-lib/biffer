@@ -9,7 +9,7 @@
 
 # @danor-lib/biffer
 ![Version](https://img.shields.io/github/package-json/v/danor-lib/biffer?style=flat-square)
-[![License](https://img.shields.io/github/license/danor-lib/biffer?style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0-standalone.html)
+[![License](https://img.shields.io/github/license/danor-lib/biffer?style=flat-square)](https://opensource.org/license/mit)
 
 一个用于 Node.js 的轻量级二进制数据解析与缓冲区操作工具，灵感来源于 Python 的 `struct` 模块。\
 A lightweight binary data parsing and buffer manipulation tool for Node.js, inspired by Python's `struct` module.

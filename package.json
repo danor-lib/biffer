@@ -1,9 +1,9 @@
 {
 	"name": "@danor-lib/biffer",
-	"version": "3.2.0",
+	"version": "3.2.1",
 	"description": "Binary data unpack library based on Node.js Buffer",
 	"author": "DanoR",
-	"license": "LGPL-3.0-or-later",
+	"license": "MIT",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/danor-lib/biffer.git"
@@ -24,7 +24,7 @@
 	"main": "./index.js",
 	"types": "./types/index.d.ts",
 	"dependencies": {
-		"@danor-lib/error": "^2.0.0"
+		"@danor-lib/error": "^2.0.1"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

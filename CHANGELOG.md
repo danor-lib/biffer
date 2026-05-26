@@ -1,6 +1,8 @@
 # CHANGELOG
 
-## unreleased
+## v3.2.1 - 2026.05.26 16
+* docs: **IMPORTANT!** update license to ***MIT***
+* docs: add refactoring note in README
 * docs: improve error code reference table
 
 
