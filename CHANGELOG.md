@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## unreleased
+* docs: improve error code reference table
+
+
 ## v3.2.0 - 2026.05.25 16
 * refactor!: due to a change in design philosophy, remove all error message text
   * in my design philosophy, an error should only contain a code and associated data. text-based message should be rendered by the terminal (including i18n and terminal highlighting)
