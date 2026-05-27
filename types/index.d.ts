@@ -1,4 +1,4 @@
-export default class Biffer {
+export class Biffer {
 	/** Sizes (in bytes) of each struct character type. */
 	static sizes$charStruct: {
 		x: number;

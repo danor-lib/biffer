@@ -1,6 +1,7 @@
 # CHANGELOG
 
-## v3.2.2 - 2026.05.27 13
+## v3.3.0 - 2026.05.27 14
+* refactor!: change `Biffer` to **named** export from **default** export
 * improve: standardize the `at` value of RichError thrown in code
 
 
