@@ -128,7 +128,7 @@ export default class Biffer {
 			// padding
 			else if(charType != 'x') {
 				throw new RichError({
-					code: 'invalid-struct-char', at: 'Biffer.unpack',
+					code: 'invalid-struct-char', at: 'biffer/Biffer.unpack',
 					data: { char: charType, indexChar, chars, struct },
 				});
 			}
@@ -162,7 +162,7 @@ export default class Biffer {
 
 			if(!len) {
 				throw new RichError({
-					code: 'invalid-struct-char', at: 'Biffer.calc',
+					code: 'invalid-struct-char', at: 'biffer/Biffer.calc',
 					data: { char, indexChar, chars, struct },
 				});
 			}
@@ -254,7 +254,7 @@ export default class Biffer {
 		}
 		else {
 			throw new RichError({
-				code: 'invalid-constructor-raw', at: 'Biffer.constructor',
+				code: 'invalid-constructor-raw', at: 'biffer/Biffer.constructor',
 				data: raw,
 			});
 		}
@@ -329,7 +329,7 @@ export default class Biffer {
 	seek(cursor) {
 		if(typeof cursor != 'number') {
 			throw new RichError({
-				code: 'invalid-seek-position', at: 'Biffer#seek',
+				code: 'invalid-seek-position', at: 'biffer/Biffer#seek',
 				data: { position: cursor, biffer: this },
 			});
 		}
@@ -344,7 +344,7 @@ export default class Biffer {
 	skip(size) {
 		if(typeof size != 'number') {
 			throw new RichError({
-				code: 'invalid-skip-offset', at: 'Biffer#skip',
+				code: 'invalid-skip-offset', at: 'biffer/Biffer#skip',
 				data: { offset: size, biffer: this },
 			});
 		}
@@ -363,13 +363,13 @@ export default class Biffer {
 	slice(size, options) {
 		if(typeof size != 'number') {
 			throw new RichError({
-				code: 'invalid-slice-size', at: 'Biffer#slice(1:size)',
+				code: 'invalid-slice-size', at: 'biffer/Biffer#slice(1:size)',
 				data: { size, biffer: this },
 			});
 		}
 		if(options && typeof options != 'object') {
 			throw new RichError({
-				code: 'invalid-slice-options', at: 'Biffer#slice(2:options)',
+				code: 'invalid-slice-options', at: 'biffer/Biffer#slice(2:options)',
 				data: { options, biffer: this },
 			});
 		}

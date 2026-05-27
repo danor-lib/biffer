@@ -277,12 +277,12 @@ const [char, int] = Biffer.unpack('c3xi', buffer);
 
 ## Error Code
 
-| Code                    | At                      | Description                                                                                                   | Context Data                       |
-| :---------------------- | :---------------------- | :------------------------------------------------------------------------------------------------------------ | :--------------------------------- |
-| invalid-struct-char     | Biffer.unpack           | The format string contains an undefined format character (not in sizes$charStruct)                            | { char, indexChar, chars, struct } |
-| invalid-struct-char     | Biffer.calc             | The format string contains an undefined format character (not in sizes$charStruct)                            | { char, indexChar, chars, struct } |
-| invalid-constructor-raw | Biffer.constructor      | The constructor raw parameter has an invalid type; only accepts Biffer, Buffer, file descriptor, or file path | raw                                |
-| invalid-seek-position   | Biffer#seek             | The `seek()` `position` parameter must be a number                                                            | { position, biffer }               |
-| invalid-skip-offset     | Biffer#skip             | The `skip()` `offset` parameter must be a number                                                              | { offset, biffer }                 |
-| invalid-slice-size      | Biffer#slice(1:size)    | The `slice()` `size` parameter must be a number                                                               | { size, biffer }                   |
-| invalid-slice-options   | Biffer#slice(2:options) | The `slice()` `options` parameter must be an object or left empty                                             | { options, biffer }                |
+| Code                    | At                             | Description                                                                                                   | Context Data                       |
+| :---------------------- | :----------------------------- | :------------------------------------------------------------------------------------------------------------ | :--------------------------------- |
+| invalid-struct-char     | biffer/Biffer.unpack           | The format string contains an undefined format character (not in sizes$charStruct)                            | { char, indexChar, chars, struct } |
+| invalid-struct-char     | biffer/Biffer.calc             | The format string contains an undefined format character (not in sizes$charStruct)                            | { char, indexChar, chars, struct } |
+| invalid-constructor-raw | biffer/Biffer.constructor      | The constructor raw parameter has an invalid type; only accepts Biffer, Buffer, file descriptor, or file path | raw                                |
+| invalid-seek-position   | biffer/Biffer#seek             | The `seek()` `position` parameter must be a number                                                            | { position, biffer }               |
+| invalid-skip-offset     | biffer/Biffer#skip             | The `skip()` `offset` parameter must be a number                                                              | { offset, biffer }                 |
+| invalid-slice-size      | biffer/Biffer#slice(1:size)    | The `slice()` `size` parameter must be a number                                                               | { size, biffer }                   |
+| invalid-slice-options   | biffer/Biffer#slice(2:options) | The `slice()` `options` parameter must be an object or left empty                                             | { options, biffer }                |

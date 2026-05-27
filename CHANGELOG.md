@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v3.2.2 - 2026.05.27 13
+* improve: standardize the `at` value of RichError thrown in code
+
+
 ## v3.2.1 - 2026.05.26 16
 * docs: **IMPORTANT!** update license to ***MIT***
 * docs: add refactoring note in README
